@@ -1,0 +1,49 @@
+﻿- type: entity
+  id: SupermatterCrystal
+  name: supermatter crystal
+  description: A strangely translucent and iridescent crystal.
+  parent: BaseMachine
+  components:
+    - type: Transform
+      anchored: true
+    - type: Physics
+      bodyType: Dynamic
+    - type: Fixtures
+      fixtures:
+        fix1:
+          shape:
+            !type:PhysShapeAabb
+              bounds: "-0.25,0,0.25,0.5"
+          density: 250
+          layer:
+            - Impassable
+            - Opaque
+          mask:
+            - Impassable
+    - type: Sprite
+      noRot: true
+      drawdepth: 2
+      sprite: Structures/Power/Generation/Supermatter/supermatter.rsi
+      state: supermatter
+    - type: PointLight
+      enabled: false
+      radius: 10
+      energy: 5
+      color: "#d9ce00"
+    - type: AmbientSound
+      enabled: true
+      volume: 1.5
+      range: 8
+      sound:
+        path: /Audio/Ambience/Objects/supermatter_calm.ogg
+    - type: Appearance
+    - type: AtmosDevice
+    - type: Supermatter
+    - type: LightningArcShooter
+      arcDepth: 2
+      maxLightningArc: 1
+      shootMinInterval: 4
+      shootMaxInterval: 10
+      shootRange: 3
+      enabled: false
+      lightningPrototype: Lightning
