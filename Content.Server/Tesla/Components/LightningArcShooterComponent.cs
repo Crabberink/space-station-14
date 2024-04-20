@@ -53,4 +53,10 @@ public sealed partial class LightningArcShooterComponent : Component
     /// </summary>
     [DataField, ViewVariables(VVAccess.ReadWrite)]
     public EntProtoId LightningPrototype = "Lightning";
+
+    /// <summary>
+    /// Whether or not to shoot lightning bolts
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public bool Enabled = true;
 }

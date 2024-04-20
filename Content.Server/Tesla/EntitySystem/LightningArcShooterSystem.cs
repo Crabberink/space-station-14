@@ -32,6 +32,8 @@ public sealed class LightningArcShooterSystem : EntitySystem
         var query = EntityQueryEnumerator<LightningArcShooterComponent>();
         while (query.MoveNext(out var uid, out var arcShooter))
         {
+            if (!arcShooter.Enabled)
+                continue;
             if (arcShooter.NextShootTime > _gameTiming.CurTime)
                 continue;
 
@@ -45,5 +47,19 @@ public sealed class LightningArcShooterSystem : EntitySystem
     {
         var arcs = _random.Next(1, component.MaxLightningArc);
         _lightning.ShootRandomLightnings(uid, component.ShootRange, arcs, component.LightningPrototype, component.ArcDepth);
+    }
+
+    public void SetEnabled(EntityUid uid, bool enabled)
+    {
+        var arcShooter = Comp<LightningArcShooterComponent>(uid);
+
+        //If the arc shooter is being enabled, generate a new NextShootTime to prevent it from immediately firing (possibly many times)
+        if (enabled && !arcShooter.Enabled)
+        {
+            var delay = TimeSpan.FromSeconds(_random.NextFloat(arcShooter.ShootMinInterval, arcShooter.ShootMaxInterval));
+            arcShooter.NextShootTime = _gameTiming.CurTime + delay;
+        }
+
+        arcShooter.Enabled = enabled;
     }
 }
