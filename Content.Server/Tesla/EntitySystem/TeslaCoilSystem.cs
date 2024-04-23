@@ -2,6 +2,8 @@ using Content.Server.Power.Components;
 using Content.Server.Power.EntitySystems;
 using Content.Server.Tesla.Components;
 using Content.Server.Lightning;
+using Content.Shared.Lightning.Components;
+using Robust.Shared.Toolshed.Commands.Debug;
 
 namespace Content.Server.Tesla.EntitySystems;
 
@@ -24,7 +26,13 @@ public sealed class TeslaCoilSystem : EntitySystem
     {
         if (TryComp<BatteryComponent>(coil, out var batteryComponent))
         {
-            _battery.SetCharge(coil, batteryComponent.CurrentCharge + coil.Comp.ChargeFromLightning);
+            //If the source of the lightning has a LightningArcShooterComponent, use the charge value from that
+            if(TryComp<LightningArcShooterComponent>(args.Source, out var lightingArcSourceComponent)) {
+                _battery.SetCharge(coil, batteryComponent.CurrentCharge + lightingArcSourceComponent.LightningCharge);
+            } else
+            {
+                _battery.SetCharge(coil, batteryComponent.CurrentCharge + coil.Comp.ChargeFromLightning);
+            }
         }
     }
 }

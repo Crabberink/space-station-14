@@ -49,6 +49,11 @@ public sealed class LightningArcShooterSystem : EntitySystem
         _lightning.ShootRandomLightnings(uid, component.ShootRange, arcs, component.LightningPrototype, component.ArcDepth);
     }
 
+    /// <summary>
+    /// Sets whether or not the LightningArcShooter is active, and will fire lightning
+    /// </summary>
+    /// <param name="uid"></param>
+    /// <param name="enabled"></param>
     public void SetEnabled(EntityUid uid, bool enabled)
     {
         var arcShooter = Comp<LightningArcShooterComponent>(uid);
@@ -61,5 +66,17 @@ public sealed class LightningArcShooterSystem : EntitySystem
         }
 
         arcShooter.Enabled = enabled;
+    }
+
+    /// <summary>
+    /// Sets the charge in watts of the lightning bolts, which will be used when they strike tesla coils
+    /// </summary>
+    /// <param name="uid"></param>
+    /// <param name="charge"></param>
+    public void SetCharge(EntityUid uid, float charge)
+    {
+        var arcShooter = Comp<LightningArcShooterComponent>(uid);
+
+        arcShooter.LightningCharge = charge;
     }
 }

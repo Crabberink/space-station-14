@@ -59,4 +59,11 @@ public sealed partial class LightningArcShooterComponent : Component
     /// </summary>
     [DataField, ViewVariables(VVAccess.ReadWrite)]
     public bool Enabled = true;
+
+    /// <summary>
+    /// The charge of the lightning.
+    /// The charge of tesla coils is increased by this value when they are struck.
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public float LightningCharge = 50000f;
 }
