@@ -1,4 +1,4 @@
-﻿using Content.Shared.Chemistry.Reagent;
+using Content.Shared.Chemistry.Reagent;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
 
@@ -83,5 +83,37 @@ namespace Content.Shared.Atmos.Prototypes
 
         [DataField("pricePerMole")]
         public float PricePerMole { get; set; } = 0;
+
+        //Supermatter gas interactions
+
+        /// <summary>
+        /// Influences zap power without interfering with the SM's own energy
+        /// </summary>
+        [DataField("supermatterPowerTransmission")]
+        public float SupermatterPowerTransmission = 0f;
+
+        /// <summary>
+        /// How much more waste gas and heat the gas causes the SM to produce
+        /// </summary>
+        [DataField("supermatterHeatModifier")]
+        public float SupermatterHeatModifier = 0f;
+
+        /// <summary>
+        /// How much heat resistance the gas gives the SM
+        /// </summary>
+        [DataField("supermatterHeatResistance")]
+        public float SupermatterHeatResistance = 0f;
+
+        /// <summary>
+        /// Allows the SM to generate extra power from heat. 
+        /// </summary>
+        [DataField("supermatterHeatPowerGeneration")]
+        public float SupermatterHeatPowerGeneration = 0f;
+
+        /// <summary>
+        /// How much powerloss does the gas prevent
+        /// </summary>
+        [DataField("supermatterPowerlossInhibition")]
+        public float SupermatterPowerlossInhibition = 0f;
     }
 }
