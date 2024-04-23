@@ -29,7 +29,8 @@
       enabled: false
       radius: 10
       energy: 5
-      color: "#d9ce00"
+      #Taken from https://github.com/tgstation/tgstation/blob/master/code/__DEFINES/supermatter.dm SUPERMATTER_COLOUR
+      color: "#ffd04f"
     - type: AmbientSound
       enabled: true
       volume: 1.5
