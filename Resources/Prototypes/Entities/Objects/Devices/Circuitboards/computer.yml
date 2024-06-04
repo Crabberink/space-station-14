@@ -395,3 +395,14 @@
       state: cpu_science
     - type: ComputerBoard
       prototype: ComputerRoboticsControl
+
+- type: entity
+  parent: BaseComputerCircuitboard
+  id: SupermatterMonitorComputerCircuitboard
+  name: CIMS console board
+  description: A computer printed circuit board for a supermatter monitoring console.
+  components:
+    - type: Sprite
+      state: cpu_engineering
+    - type: ComputerBoard
+      prototype: ComputerSupermatterMonitor

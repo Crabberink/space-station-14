@@ -1115,3 +1115,22 @@
     access: [["ResearchDirector"]]
   - type: Lock
     unlockOnClick: false
+
+- type: entity
+  parent: BaseComputer
+  id: ComputerSupermatterMonitor
+  name: CIMS console
+  description: Crystal Integrity Monitoring System, connects to specially calibrated sensors to provide real time information on supermatter-based engines.
+  components:
+  - type: Computer
+    board: SupermatterMonitorComputerCircuitboard
+  - type: Sprite
+    layers:
+    - map: ["computerLayerBody"]
+      state: computer
+    - map: ["computerLayerKeyboard"]
+      state: generic_keyboard
+    - map: ["computerLayerScreen"]
+      state: cims
+    - map: ["computerLayerKeys"]
+      state: generic_keys

@@ -291,6 +291,10 @@
                 ]
             ]
         },
+		{
+            "name": "cims",
+            "directions": 4
+        },
         {
             "name": "comm",
             "directions": 4,
