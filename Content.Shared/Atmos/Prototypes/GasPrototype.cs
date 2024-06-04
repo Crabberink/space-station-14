@@ -89,30 +89,45 @@ namespace Content.Shared.Atmos.Prototypes
         /// <summary>
         /// Influences zap power without interfering with the SM's own energy
         /// </summary>
+        /// <remarks>
+        /// Scales based on the percentage of the mix consists of the gas
+        /// </remarks>
         [DataField("supermatterPowerTransmission")]
         public float SupermatterPowerTransmission = 0f;
 
         /// <summary>
         /// How much more waste gas and heat the gas causes the SM to produce
         /// </summary>
+        /// <remarks>
+        /// Scales based on the percentage of the mix consists of the gas
+        /// </remarks>
         [DataField("supermatterHeatModifier")]
         public float SupermatterHeatModifier = 0f;
 
         /// <summary>
         /// How much heat resistance the gas gives the SM
         /// </summary>
+        /// <remarks>
+        /// Scales based on the percentage of the mix consists of the gas
+        /// </remarks>
         [DataField("supermatterHeatResistance")]
         public float SupermatterHeatResistance = 0f;
 
         /// <summary>
         /// Allows the SM to generate extra power from heat. 
         /// </summary>
+        /// <remarks>
+        /// Scales based on the percentage of the mix consists of the gas
+        /// </remarks>
         [DataField("supermatterHeatPowerGeneration")]
         public float SupermatterHeatPowerGeneration = 0f;
 
         /// <summary>
         /// How much powerloss does the gas prevent
         /// </summary>
+        /// <remarks>
+        /// Scales based on the percentage of the mix consists of the gas
+        /// </remarks>
         [DataField("supermatterPowerlossInhibition")]
         public float SupermatterPowerlossInhibition = 0f;
     }

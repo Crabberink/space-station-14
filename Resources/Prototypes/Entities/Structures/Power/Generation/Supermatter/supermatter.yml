@@ -2,12 +2,10 @@
   id: SupermatterCrystal
   name: supermatter crystal
   description: A strangely translucent and iridescent crystal.
-  parent: BaseMachine
+  parent: BaseStructure
   components:
     - type: Transform
       anchored: true
-    - type: Physics
-      bodyType: Dynamic
     - type: Fixtures
       fixtures:
         fix1:
@@ -20,16 +18,73 @@
             - Opaque
           mask:
             - Impassable
+    - type: InteractionOutline
     - type: Sprite
       noRot: true
       drawdepth: 2
       sprite: Structures/Power/Generation/Supermatter/supermatter.rsi
       state: supermatter
+    - type: Damageable
+      damageContainer: Inorganic
+      damageModifierSet: Metallic
     - type: PointLight
       enabled: false
       radius: 10
       energy: 5
-      #Taken from https://github.com/tgstation/tgstation/blob/master/code/__DEFINES/supermatter.dm SUPERMATTER_COLOUR
+      color: "#ffd04f"
+    - type: AmbientSound
+      enabled: true
+      volume: 1.5
+      range: 8
+      sound:
+        path: /Audio/Ambience/Objects/supermatter_calm.ogg
+    - type: Appearance
+    - type: AtmosDevice
+    - type: Supermatter
+    - type: LightningArcShooter
+      arcDepth: 2
+      maxLightningArc: 1
+      shootMinInterval: 4
+      shootMaxInterval: 10
+      shootRange: 3
+      enabled: false
+      lightningPrototype: Lightning
+      
+- type: entity
+  id: SupermatterShard
+  name: supermatter shard
+  description: A strangely translucent and iridescent crystal that looks like it used to be part of a larger structure.
+  parent: BaseStructure
+  components:
+    - type: Transform
+      anchored: false
+    - type: Fixtures
+      fixtures:
+        fix1:
+          shape:
+            !type:PhysShapeAabb
+              bounds: "-0.25,0,0.25,0.5"
+          density: 250
+          layer:
+            - Impassable
+            - Opaque
+          mask:
+            - Impassable
+    - type: InteractionOutline
+    - type: Sprite
+      noRot: true
+      drawdepth: 2
+      sprite: Structures/Power/Generation/Supermatter/supermatter_shard.rsi
+      state: supermatter_shard
+    - type: Damageable
+      damageContainer: Inorganic
+      damageModifierSet: Metallic
+    - type: Anchorable
+      delay: 3
+    - type: PointLight
+      enabled: false
+      radius: 10
+      energy: 5
       color: "#ffd04f"
     - type: AmbientSound
       enabled: true

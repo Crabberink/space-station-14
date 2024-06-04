@@ -1,4 +1,7 @@
+using Content.Shared.Atmos;
+using Content.Shared.Radio;
 using Robust.Shared.Audio;
+using Robust.Shared.Prototypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,36 +24,117 @@ public sealed partial class SupermatterComponent : Component
     /// <remarks>
     /// A value of 0.15 means 15% of gas is absorbed
     /// </remarks>
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("absorptionRatio")]
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
     public float AbsorptionRatio = 0.15f;
 
     /// <summary>
-    /// The amount of internal energy in the supermatter measured in GeV. This value affects gas output, damage, and power generation.
+    /// The amount of internal energy in the supermatter measured in MeV. This value affects gas output, damage, and power generation.
     /// </summary>
     /// <remarks>
     /// This value starts off at zero, meaning the SM is inactive.
     /// </remarks>
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("internalEnergy")]
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
     public float InternalEnergy = 0f;
 
     /// <summary>
     /// The amount of damage the crystal has received.
-    /// When this value reaches 100, the SM will begin a countdown before delaminating.
+    /// When this value reaches 100, the SM will delaminate.
     /// </summary>
-    /// <remarks>
-    /// This value can extend past 100, and a delamination will not be halted until it returns below 100
-    /// </remarks>
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("damage")]
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
     public float Damage = 0f;
 
     /// <summary>
-    /// The amount of damage the crystal had last update. This is used to check if the SM is taking damage or healing
+    /// The amount of damage the crystal has received.
+    /// When this value reaches 100, the SM will delaminate.
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public float PreviousDamage = 0f;
+
+    /// <summary>
+    /// Higher values mean less waste gas and heat is released
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public float ReactionPowerModifier = 0.65f;
+
+    /// <summary>
+    /// Higher values mean less plasma released
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public float PlasmaReleaseModifier = 650f;
+
+    /// <summary>
+    /// Higher values mean less oxygen released
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public float OxygenReleaseModifier = 340f;
+
+    /// <summary>
+    /// Higher values mean less heat released
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public float ThermalReleaseModifier = 4f;
+
+    /// <summary>
+    /// The amount of energy gained from external sources such as emitters
     /// </summary>
     [ViewVariables(VVAccess.ReadOnly)]
-    public float PreviousDamage = 0f;
+    public float ExternalPowerGain = 0f;
+
+    /// <summary>
+    /// InternalEnergy is multiplied by this to get the watts of power per zap. Measured in W/MeV
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
+    public float BasePowerTransmission = 1040f;
+
+    /// <summary>
+    /// Higher value means higher safe operational temperature
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public float HeatPenaltyThreshold = 40f;
+
+    /// <summary>
+    /// When the mols the SM has absorbed exceeds this amount it will begin taking damage and delamming into a singulo
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public float MolePenaltyThreshold = 1800f;
+
+    /// <summary>
+    /// When the SMs internal energy exceeds this value, it will take damage and begin delamming into a tesla
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public float PowerPenaltyThreshold = 5000f;
+
+    /// <summary>
+    /// Multiplies the amount and temperature of waste gas
+    /// </summary>
+    [DataField,ViewVariables(VVAccess.ReadWrite)]
+    public float WasteMultiplier = 0f;
+
+    /// <summary>
+    /// Scales the power gain from temperature caused by some gasses
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public float GasHeatPowerScale = 1 / 6f;
+
+    /// <summary>
+    /// Whether or not the crystal has been activated (something has given it internal energy)
+    /// </summary>
+    /// <seealso cref="InternalEnergy"></seealso>
+    [DataField,ViewVariables(VVAccess.ReadWrite)]
+    public bool Activated = false;
+
+    /// <summary>
+    /// The current type of delamination the SM is experiencing
+    /// </summary>
+    [ViewVariables(VVAccess.ReadOnly)]
+    public DelaminationType DelamType = DelaminationType.None;
+
+    /// <summary>
+    /// The internal gasmix of the supermatter
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)]
+    [DataField("gasMixture")]
+    public GasMixture GasMix = new();
 
     /// <summary>
     /// The sound that plays when an object is destroyed by the SM
@@ -58,6 +142,51 @@ public sealed partial class SupermatterComponent : Component
     [ViewVariables(VVAccess.ReadWrite)]
     [DataField("dustSound")]
     public SoundSpecifier ObjectDustedSound = new SoundPathSpecifier("/Audio/Effects/supermatter_consume.ogg");
+
+    /// <summary>
+    /// The warning sound that plays when the sm is losing integrity
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public SoundSpecifier WarningAlarmSound = new SoundPathSpecifier("/Audio/Machines/supermatter_warning.ogg");
+
+    /// <summary>
+    /// The warning sound that plays when the sm integrity is at levels specified by <see cref="DangerPoint"/>
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public SoundSpecifier DangerAlarmSound = new SoundPathSpecifier("/Audio/Machines/supermatter_danger.ogg");
+
+    /// <summary>
+    /// The warning sound that plays when the sm integrity is at levels specified by <see cref="EmergencyPoint"/>
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public SoundSpecifier EmergencyAlarmSound = new SoundPathSpecifier("/Audio/Machines/supermatter_emergency.ogg");
+
+    /// <summary>
+    /// The warning sound that plays when the sm begins delaminating
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public SoundSpecifier DelaminationAlarmSound = new SoundPathSpecifier("/Audio/Machines/supermatter_delam_alarm.ogg");
+
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public SupermatterWarningLevel WarningLevel = SupermatterWarningLevel.Safe;
+
+    /// <summary>
+    /// The amount of time between warning messages
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public TimeSpan WarningInterval = TimeSpan.FromSeconds(15f);
+
+    /// <summary>
+    /// The next time point that needs pass to send an alert
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public TimeSpan NextWarnTime = TimeSpan.Zero;
+
+    /// <summary>
+    /// The radio channel the SM is using when sending alerts
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public ProtoId<RadioChannelPrototype> AlertRadioChannel = "Engineering";
 
     /// <summary>
     /// If an object with this tag collides with the SM, it will play no sound.
@@ -68,58 +197,20 @@ public sealed partial class SupermatterComponent : Component
     public string NoSoundTag = "EmitterBolt";
 
     /// <summary>
-    /// This is the temperature (Kelvin) at which the crystal will begin taking damage 
+    /// The damage at which the supermatter warning level will be considered warning
     /// </summary>
-    /// <remarks>
-    /// It starts at 40 C
-    /// </remarks>
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("temperatureLimit")]
-    public float TemperatureLimit = 313.15f;
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public float WarningPoint = 5f;
 
     /// <summary>
-    /// Multiplies the amount and temperature of waste gas
+    /// The damage at which the supermatter warning level will be considered danger
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("wasteMultiplier")]
-    public float WasteMultiplier = 0f;
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public float DangerPoint = 60f;
 
     /// <summary>
-    /// This value is used to determine the wattage of the electrical arcs discharged by the SM by default.
-    /// It represents the watts per MeV of internal energy (W/MeV).
+    /// The damage at which the supermatter warning level will be considered emergency
     /// </summary>
-    /// <seealso cref="InternalEnergy"></seealso>
-    /// <seealso cref="ZapPowerTransmission"></seealso>
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("zapTransmissionRate")]
-    public float ZapTransmissionRate = 1040f;
-
-    /// <summary>
-    /// This value is used to determine the wattage of the electrical arcs discharged by the SM based on the absorbed gases
-    /// It represents the watts per MeV of internal energy (W/MeV)
-    /// </summary>
-    /// <seealso cref="InternalEnergy"></seealso>
-    /// <seealso cref="ZapPowerTransmission"></seealso>
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("gasPowerTransmissionRate")]
-    public float GasPowerTransmissionRate = 0f;
-
-    /// <summary>
-    /// The watts of power that the electrical arcs discharged by the SM carry.
-    /// This value is calculated using the InternalEnergy, ZapTransmissionRate, and GasPowerTransmissionRate
-    /// </summary>
-    /// <seealso cref="InternalEnergy"></seealso>
-    /// <seealso cref="ZapTransmissionRate"></seealso>
-    /// <seealso cref="GasPowerTransmissionRate"></seealso>
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("zapPowerTransmission")]
-    public float ZapPowerTransmission = 0;
-
-    /// <summary>
-    /// Whether or not the crystal has been activated (something has given it internal energy)
-    /// </summary>
-    /// <seealso cref="InternalEnergy"></seealso>
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("activated")]
-    public bool Activated = false;
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public float EmergencyPoint = 75f;
 }
