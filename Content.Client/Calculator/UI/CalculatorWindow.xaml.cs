@@ -27,14 +27,17 @@ public sealed partial class CalculatorWindow : DefaultWindow
 
     void FillInputGrid()
     {
-
+        for (int i = 0; i < 6 * 4; i++)
+        {
+            AddNumberButton(i);
+        }
     }
 
-    void AddNumberButton(byte i)
+    void AddNumberButton(int i)
     {
         var button = new Button
         {
-            Name = $"{i}",
+            Text = $"{i}",
         };
 
         button.OnPressed += _ =>
@@ -42,6 +45,6 @@ public sealed partial class CalculatorWindow : DefaultWindow
             //TODO: ADD BUTTON BEHAVIOR
         };
 
-        InputGrid.
+        InputGrid.AddChild(button);
     }
 }
