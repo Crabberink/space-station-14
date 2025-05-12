@@ -1,0 +1,34 @@
+- type: entity
+  parent: BaseItem
+  id: Calculator
+  name: calcu-max
+  description: The latest innovation in space calculation technology. Perfect for checking if 2 + 2 is still 4.
+  components:
+    - type: EmitSoundOnLand
+      sound:
+        path: /Audio/Items/multitool_drop.ogg
+    - type: Sprite
+      sprite: Objects/Tools/calculator.rsi
+      state: icon
+    - type: Item
+      size: Small
+    - type: Clothing
+      sprite: Objects/Tools/access_configurator.rsi
+      quickEquip: false
+      slots:
+        - Belt
+    - type: Calculator
+    - type: UserInterface
+      interfaces:
+        enum.CalculatorUiKey.Key:
+          type: CalculatorBoundUserInterface
+    - type: ActivatableUI
+      key: enum.CalculatorUiKey.Key
+      requiresComplex: true
+      requireActiveHand: false
+      singleUser: true
+      inHandsOnly: true
+    - type: ItemSlots
+    - type: ContainerContainer
+      containers:
+        AccessOverrider-privilegedId: !type:ContainerSlot
