@@ -117,6 +117,10 @@ namespace Content.Client.Stylesheets
         public static readonly Color ButtonColorGoodHovered = Color.FromHex("#31843E");
         public static readonly Color ButtonColorGoodDisabled = Color.FromHex("#164420");
 
+        public static readonly Color ButtonColorOrangeDefault  = Color.FromHex("#E3950E");
+        public static readonly Color ButtonColorOrangeHovered  = Color.FromHex("#F0A31F");
+        public static readonly Color ButtonColorOrangeDisabled = Color.FromHex("#946C26");
+
         //NavMap
         public static readonly Color PointRed = Color.FromHex("#B02E26");
         public static readonly Color PointGreen = Color.FromHex("#38b026");
@@ -155,6 +159,7 @@ namespace Content.Client.Stylesheets
         public const string StyleClassCrossButtonRed = "CrossButtonRed";
         public const string StyleClassButtonColorRed = "ButtonColorRed";
         public const string StyleClassButtonColorGreen = "ButtonColorGreen";
+        public const string StyleClassButtonColorOrange = "ButtonColorOrange";
 
         public static readonly Color ChatBackgroundColor = Color.FromHex("#25252ADD");
 
@@ -606,6 +611,9 @@ namespace Content.Client.Stylesheets
             var directionIconArrowTex = resCache.GetTexture("/Textures/Interface/VerbIcons/drop.svg.192dpi.png");
             var directionIconQuestionTex = resCache.GetTexture("/Textures/Interface/VerbIcons/information.svg.192dpi.png");
             var directionIconHereTex = resCache.GetTexture("/Textures/Interface/VerbIcons/dot.svg.192dpi.png");
+
+            //7-segment display font:
+            var dseg712 = resCache.GetFont("/Fonts/DSEG7/DSEG7Classic-Regular.ttf", 12);
 
             Stylesheet = new Stylesheet(BaseRules.Concat(new[]
             {
@@ -1662,6 +1670,23 @@ namespace Content.Client.Stylesheets
                 Element<Button>().Class("ButtonColorGreen").Pseudo(ContainerButton.StylePseudoClassHover)
                     .Prop(Control.StylePropertyModulateSelf, ButtonColorGoodHovered),
 
+                // ---
+
+                // Orange Button (maybe should be separate from red and green) ---
+                Element<Button>().Class("ButtonColorOrange")
+                    .Prop(Control.StylePropertyModulateSelf, ButtonColorOrangeDefault),
+
+                Element<Button>().Class("ButtonColorOrange").Pseudo(ContainerButton.StylePseudoClassNormal)
+                    .Prop(Control.StylePropertyModulateSelf, ButtonColorOrangeDefault),
+
+                Element<Button>().Class("ButtonColorOrange").Pseudo(ContainerButton.StylePseudoClassHover)
+                    .Prop(Control.StylePropertyModulateSelf, ButtonColorOrangeHovered),
+
+                Element<Button>().Class("ButtonColorOrange").Pseudo(ContainerButton.StylePseudoClassDisabled)
+                    .Prop(Control.StylePropertyModulateSelf, ButtonColorOrangeDisabled),
+
+                // ---
+
                 // Accept button (merge with green button?) ---
                 Element<Button>().Class("ButtonAccept")
                     .Prop(Control.StylePropertyModulateSelf, ButtonColorGoodDefault),
@@ -1825,6 +1850,11 @@ namespace Content.Client.Stylesheets
                 Element<PanelContainer>()
                     .Class(StyleClassInset)
                     .Prop(PanelContainer.StylePropertyPanel, insetBack),
+
+                // Calculator display
+                Element<Label>().Class("CalculatorText")
+                    .Prop("font", dseg712)
+                    .Prop("font-color", Color.FromHex("#18c2ed")),
             }).ToList());
         }
     }
